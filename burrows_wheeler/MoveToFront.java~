@@ -1,0 +1,37 @@
+import edu.princeton.cs.algs4.BinaryStdIn;
+import edu.princeton.cs.algs4.BinaryStdOut;
+import edu.princeton.cs.algs4.StdOut;
+
+public class MoveToFront {
+    private final int R = 256;
+    
+    // apply move-to-front encoding, reading from standard input and writing to standard output
+    public static void encode() {
+        int first = 0;
+        String t = "";        
+        String inStr = BinaryStdIn.readString();
+        
+        int len = inStr.length;
+        int[] out = new int[R];
+        for (int r = 0; r < R; r++)
+            out[r] = r;
+        
+        for (int i = 0; i < len; i++) {
+            idx = inStr.charAt(i);
+            StdOut.BinaryStdOut.write(out[idx]);
+            int[] aux = new int[idx];
+            aux[0] = idx;
+            for (int r = 1; r < idx; r++)
+                aux[r] = out[r-1];
+            
+            for (int r = 0; r < idx; r++)
+                out[r] = aux[r];
+        }
+
+    // apply move-to-front decoding, reading from standard input and writing to standard output
+    public static void decode()
+
+    // if args[0] is '-', apply move-to-front encoding
+    // if args[0] is '+', apply move-to-front decoding
+    public static void main(String[] args)
+}

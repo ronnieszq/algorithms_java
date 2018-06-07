@@ -1,0 +1,47 @@
+import edu.princeton.cs.algs4.WeightedQuickUnionUF;
+
+public class Percolation
+{
+    private int[] opensite;   // opensite[i] = 1 if the site is open
+    private int gridsize;     // dimention of the grid
+    
+    public Percolation(int n)
+    {
+        gridsize = n
+        opensite = new int(n * n);
+        for (int i = 1; i < n * n + 1; i++) opensite[i] = 0;
+    }
+    
+    public void open(int row, int col)
+    {
+        validate(row, col);        
+        int p = xyTo1D(row, col);
+        opensite[p] = 1;
+        if (isopen(row, col - 1)) {
+            WeightedQuickUnionUF.union(p - 1, p);
+        }
+        if (isopen(row, col + 1)) {
+            WeightedQuickUnionUF.union(p, p + 1);
+        }
+        if (isopen(row - 1, col)) {
+            WeightedQuickUnionUF.union(p - gridsize, p);
+        }
+        if (isopen(row + 1, col)) {
+            WeightedQuickUnionUF.union(p, p + gridsize);
+        }
+    }
+    
+    private int xyTo1D(int row, int col)
+    {
+        return (row - 1) * gridsize + col;
+    }
+    
+    private void validate(int row, int col)
+    {
+        if (row <= 0 || row > gridsize) {
+            throw new IllegalArgumentException("index " + row + " is not between 1 and " + gridsize);
+        if (col <= 0 || col > gridsize) {
+            throw new IllegalArgumentException("index " + col + " is not between 1 and " + gridsize);
+        }
+    }
+      

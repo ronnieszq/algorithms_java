@@ -1,0 +1,31 @@
+import edu.princeton.cs.algs4.BinaryStdIn;
+import edu.princeton.cs.algs4.BinaryStdOut;
+
+public class BurrowsWheeler {
+    private CircularSuffixArray csa;
+    private int first;
+    private String inStr;
+    private String t;
+    
+    // apply Burrows-Wheeler transform, reading from standard input and writing to standard output
+    public static void transform() {
+        inStr = BinaryStdIn.readString();
+        t = "";
+        csa = new CircularSuffixArray(input);
+        for (int i = 0; i < csa.length()) {
+            int idx = csa.index(i);
+            if (idx == 0) first = idx;
+            t += inStr.charAt(idx-1);
+        }
+        
+        BinaryStdOut.write(first);
+        BinaryStdOut.write(inStr);
+    }
+
+    // apply Burrows-Wheeler inverse transform, reading from standard input and writing to standard output
+    public static void inverseTransform() {}
+
+    // if args[0] is '-', apply Burrows-Wheeler transform
+    // if args[0] is '+', apply Burrows-Wheeler inverse transform
+    public static void main(String[] args) {}
+}

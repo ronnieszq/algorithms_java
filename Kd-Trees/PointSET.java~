@@ -1,0 +1,125 @@
+import edu.princeton.cs.algs4.SET;
+import edu.princeton.cs.algs4.Point2D;
+import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.Queue;
+import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.In;
+
+public class PointSET {
+    
+    private SET<Point2D> pointSet;
+    
+    /**
+     * Initializes an empty set of points.
+     */
+    public PointSET() {
+        pointSet = new SET<Point2D>();
+    }
+
+    /**
+     * Is this set empty?
+     * @return true if the set is empty, otherwise false
+     */
+    public boolean isEmpty() {
+        return pointSet.isEmpty();
+    }
+    
+    /**
+     * Number of points in the set
+     * @return the number of points in the set
+     */
+    public int size() {
+        return pointSet.size();
+    }
+
+    /**
+     * Add the point to the set (if it is not already in the set)
+     * @param  p the point to be added to the set
+     */
+    public void insert(Point2D p){
+        Point2D point = p;
+        pointSet.add(point); 
+    }
+    
+    /**
+     * Does the set contain point p?
+     * @param  p the point to check whether it is in the set
+     * @return true if the set contains the point, otherwise false
+     */
+    public boolean contains(Point2D p) {
+        Point2D point = p;
+        return pointSet.contains(point);
+    }
+    
+    /**
+     * Draw all points to standard draw
+     */
+    public void draw(){
+        /**
+         * PenColor and PenRadius are set in the test client
+         * StdDraw.setPenColor(StdDraw.BLACK);
+         * StdDraw.setPenRadius(0.01);
+         */
+        for (Point2D pt : pointSet) {
+            pt.draw();
+        }
+    }
+    
+    /**
+     * Find all points that are inside the rectangle (or on the boundary)
+     * @param  rect the rectangle against which points are checked
+     * @return an iterator containing all the points inside the rectangle
+     */
+    public Iterable<Point2D> range(RectHV rect) {
+        RectHV rectRange = rect;
+        Queue<Point2D> points = new Queue<Point2D>();
+        for (Point2D pt : pointSet) {
+            if (rectRange.contains(pt)) points.enqueue(pt);
+        }
+        return points;
+    }
+    
+    /**
+     * Find the nearest neighbor in the set to point p
+     * Return null if the set is empty
+     * @param  p the point against which all points in the set are checked
+     * @return a point in the set that is the nearest neighbor of point p
+     */
+    public Point2D nearest(Point2D p) {
+        Point2D alienPoint = p;
+        Point2D nearestNeighbor = null;
+        double minDist = 1.0;
+        for (Point2D pt : pointSet) {
+            if (pt.distanceSquaredTo(p) < minDist) minDist = pt.distanceSquaredTo(p);
+            nearestNeighbor = pt;
+        }
+        return nearestNeighbor;
+    }
+    
+    /**
+     * Unit tests the PointSET data type.
+     */
+    public static void main(String[] args) {
+        // initialize the two data structures with point from file
+        PointSET brutePointSet = new PointSET();
+        Point2D p1 = new Point2D(0.372, 0.497);
+        Point2D p2 = new Point2D(0.564, 0.413);
+        
+        brutePointSet.insert(p1);
+        brutePointSet.insert(p2);
+        StdOut.println(brutePointSet.size());
+        StdOut.println(brutePointSet.isEmpty());
+        StdOut.println(brutePointSet.contains(p1));
+        brutePointSet.draw();
+        
+        StdDraw.setPenColor(StdDraw.RED);
+        StdDraw.setPenRadius(0.02);
+        // the location (x, y) of the mouse
+        double x = StdDraw.mouseX();
+        double y = StdDraw.mouseY();
+        Point2D query = new Point2D(0.5, 0.5);
+        query.draw();
+        brutePointSet.nearest(query).draw();
+    }
+}

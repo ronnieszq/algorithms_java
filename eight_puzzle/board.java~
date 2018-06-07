@@ -1,0 +1,27 @@
+public class Board {
+	private final char[] blocks;	// immutable character representation of the block of integers
+	private final int dim;			// the dimension of the board
+	public Board(int[][] blocks) {
+		// use a length n^2 char[] array as a copy of the input n-by-n integer array
+		// to reduce the amount of memory and make the data type immutable
+		this.dim = blocks.length;
+		// make a copy of the input blocks
+		for (int i = 1; i < this.dim * this.dim; i++) {
+			this.blocks[i] = blocks[i / this.dim, i % this.dim];
+		}
+	}
+
+    public int dimension() {
+		return this.dim;
+	}
+
+    public int hamming()                   // number of blocks out of place
+    public int manhattan()                 // sum of Manhattan distances between blocks and goal
+    public boolean isGoal()                // is this board the goal board?
+    public Board twin()                    // a board that is obtained by exchanging any pair of blocks
+    public boolean equals(Object y)        // does this board equal y?
+    public Iterable<Board> neighbors()     // all neighboring boards
+    public String toString()               // string representation of this board (in the output format specified below)
+
+    public static void main(String[] args) // unit tests (not graded)
+}

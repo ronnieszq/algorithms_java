@@ -1,0 +1,48 @@
+import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
+
+public class SAP {
+
+    private final Digraph G;  // instance variable for the associated digraph
+    private boolean marked;   // is there an ancestral path?
+    private int sLength;      // the shortest length
+    private int cAncestor;    // the common ancestor
+    
+    // constructor takes a digraph (not necessarily a DAG)
+    public SAP(Digraph G) {
+        this.G = G;           // a defensive copy of the digraph
+        sLength = INFINITY;
+        cAncestor = -1;
+    }
+    
+    // length of shortest ancestral path between v and w; -1 if no such path
+    public int length(int v, int w) {
+        BreadthFirstDirectedPaths bfs1 = new BreadthFirstDirectedPaths(this.G, v);
+        BreadthFirstDirectedPaths bfs2 = new BreadthFirstDirectedPaths(this.G, w);
+        for (int x = 0; x < this.G.V(), x++) {
+            if (bfs1.hasPathTo(x) && bfs2.hasPathTo(x)) {
+                marked = True;
+                if ((bfs1.distTo(x) + bfs2.distTo(x)) < sLength) {
+                    sLength = bfs1.distTo(x) + bfs2.distTo(x);
+                    cAncestor = x;
+                }
+            }
+        }
+        if (marked) return sLength;
+        else        return -1;
+    }
+
+    // a common ancestor of v and w that participates in a shortest ancestral path; -1 if no such path
+    public int ancestor(int v, int w) {
+        return cAncestor;
+    }
+
+   // length of shortest ancestral path between any vertex in v and any vertex in w; -1 if no such path
+   public int length(Iterable<Integer> v, Iterable<Integer> w)
+
+   // a common ancestor that participates in shortest ancestral path; -1 if no such path
+   public int ancestor(Iterable<Integer> v, Iterable<Integer> w)
+
+   // do unit testing of this class
+   public static void main(String[] args)
+}

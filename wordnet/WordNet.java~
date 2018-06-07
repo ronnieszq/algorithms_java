@@ -1,0 +1,62 @@
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.SeparateChainingHashST;
+
+public class WordNet {
+	private SeparateChainingHashST<String> st = new SeparateChainingHashST<String>();
+	private SAP sap;
+	private final int V;			// number of synsets
+	private final Digraph G;        // the WordNet digraph
+	
+	// constructor takes the name of the two input files
+	public WordNet(String synsets, String hypernyms) {
+		renderSynset(synsets);
+		this.G = new Digraph(this.V);
+		buildDigraph(hypernyms);
+		sap = new SAP(this.G);
+	}
+	
+	// Read synsets in the input and store the id-synset pair in a symbol table.
+	// Record the number of synsets for later use.
+	private void renderSynset(String s) {
+		In in = new In(s);
+        while (!in.isEmpty()) {
+			String[] elements = string.split(",");
+			st.put(elements[0], Integer.parseInt(elements[1]));
+			this.V++;
+		}
+	}
+	
+	private void buildDigraph(String h) {
+		In in = new In(h);
+        while (!in.isEmpty()) {
+			String[] elements = string.split(",");
+			// convert hypernyms id into integer
+			for (int i = 1; i < elements.length(), i++)
+				this.G.addEdge(Integer.parseInt(elements[0]), Integer.parseInt(elements[i]));
+		}
+	}
+	
+	// returns all WordNet nouns
+	public Iterable<String> nouns() {
+		return st.keys();
+	}
+
+	// is the word a WordNet noun?
+	public boolean isNoun(String word) {
+		return st.contains(word);
+	}
+
+	// distance between nounA and nounB (defined below)
+	public int distance(String nounA, String nounB) {
+		return sap.length(st.get(nounA), st.get(nounB));
+	}
+
+	// a synset (second field of synsets.txt) that is the common ancestor of nounA and nounB
+	// in a shortest ancestral path (defined below)
+	public String sap(String nounA, String nounB) {
+		return sap.ancestor(st.get(nounA), st.get(nounB));
+	}
+
+	// do unit testing of this class
+	public static void main(String[] args)
+}

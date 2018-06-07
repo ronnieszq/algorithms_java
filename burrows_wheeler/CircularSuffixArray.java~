@@ -1,0 +1,122 @@
+public class CircularSuffixArray {
+    private int n;               // length of input string
+    private String text;         // input text
+    private int[] index;         // offset of ith string in order
+    private int[] rank;          // rank of ith string
+    private int[] newrank;       // rank of ith string (temporary)
+    private int offset;
+    /** circular suffix array of s
+     *  implementation based on Manber-Meyers algorithm
+     *  sort the first character using key indexed sorting
+     *  3-way quick sort the remaining suffix
+     */
+    public CircularSuffixArray(String s) {
+        n = s.length();
+        text = s;
+        index   = new int[n+1];
+        rank    = new int[n+1];
+        newrank = new int[n+1];
+
+        // sentinels
+        index[n] = n;
+        rank[n] = -1;
+
+        msd();
+        doit();
+    }
+    
+    // do one pass of msd sorting by rank at given offset
+    private void doit() {
+        for (offset = 1; offset < n; offset += offset) {
+            int count = 0;
+            for (int i = 1; i <= n; i++) {
+                if (rank[index[i]] == rank[index[i-1]]) count++;
+                else if (count > 0) {
+                    // sort
+                    int left = i-1-count;
+                    int right = i-1;
+                    quicksort(left, right);
+
+                    // now fix up ranks
+                    int r = rank[index[left]];
+                    for (int j = left + 1; j <= right; j++) {
+                        if (less(index[j-1], index[j]))  {
+                            r = rank[index[left]] + j - left; 
+                        }
+                        newrank[index[j]] = r;
+                    }
+
+                    // copy back - note can't update rank too eagerly
+                    for (int j = left + 1; j <= right; j++) {
+                        rank[index[j]] = newrank[index[j]];
+                    }
+
+                    count = 0;
+                }
+            }
+        }
+    }
+
+    // sort by leading char, assumes extended ASCII (256 values)
+    private void msd() {
+        final int R = 26;
+
+        // calculate frequencies
+        int[] freq = new int[R];
+        for (int i = 0; i < n; i++)
+            freq[text.charAt(i)]++;
+
+        // calculate cumulative frequencies
+        int[] cumm = new int[R];
+        for (int i = 1; i < R; i++)
+            cumm[i] = cumm[i-1] + freq[i-1];
+
+        // compute ranks
+        for (int i = 0; i < n; i++)
+            rank[i] = cumm[text.charAt(i)];
+
+        // sort by first char
+        for (int i = 0; i < n; i++)
+            index[cumm[text.charAt(i)]++] = i;
+    }
+
+    // quicksort the subarray a[lo .. hi] using 3-way partitioning
+    private static void quicksort(int lo, int hi) { 
+        if (hi <= lo) return;
+        int lt = lo, gt = hi;
+        int i = lo + 1;
+        while (i <= gt) {
+            if      (less(i, lo)) exch(lt++, i++);
+            else if (less(lo, i)) exch(i, gt--);
+            else                  i++;
+        }
+
+        quicksort(lo, lt-1);
+        quicksort(a, gt+1, hi);
+    }
+    
+    // helper function for comparing
+    private boolean less(int v, int w) {
+        return rank[v + offset] < rank[w + offset];
+    }
+    
+    // helper function to exchange
+    private void exch(int i, int j) {
+        int swap = index[i];
+        index[i] = index[j];
+        index[j] = swap;
+    }
+    
+    // length of s
+    public int length() {
+        return n;
+    }
+    
+    // returns index of ith sorted suffix
+    public int index(int i) {
+        if (i < 0 || i >= n) throw new IllegalArgumentException();
+        return index[i];
+    }       
+    // unit testing (required)
+    public static void main(String[] args) {}  
+}

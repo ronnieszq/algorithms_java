@@ -1,0 +1,195 @@
+import java.util.Iterator;
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.SET;
+
+public class BoggleSolver {
+    private TrieSET dict = new TrieSET();
+    
+    // 26-way TrieSET data structure
+    private class TrieSET implements Iterable<String> {
+        private static final int R = 26;        // Uppercase alphabet
+        
+        private Node root;      // root of trie
+        private int n;          // number of keys in trie
+        
+        // R-way trie node
+        private static class Node {
+            private Node[] next = new Node[R];
+            private boolean isString;
+        }
+        
+        /**
+         * Initializes an empty set of strings.
+         */
+        public TrieSET() {
+        }
+        
+        /**
+         * Does the set contain the given key?
+         * @param key the key
+         * @return {@code true} if the set contains {@code key} and
+         *     {@code false} otherwise
+         * @throws IllegalArgumentException if {@code key} is {@code null}
+         */
+        public boolean contains(String key) {
+            if (key == null) throw new IllegalArgumentException("argument to contains() is null");
+            Node x = get(root, key, 0);
+            if (x == null) return false;
+            return x.isString;
+        }
+        
+        private Node get(Node x, String key, int d) {
+            if (x == null) return null;
+            if (d == key.length()) return x;
+            char c = key.charAt(d);
+            return get(x.next[c], key, d+1);
+        }
+        
+        /**
+         * Adds the key to the set if it is not already present.
+         * @param key the key to add
+         * @throws IllegalArgumentException if {@code key} is {@code null}
+         */
+        public void add(String key) {
+            if (key == null) throw new IllegalArgumentException("argument to add() is null");
+            root = add(root, key, 0);
+        }
+        
+        private Node add(Node x, String key, int d) {
+            if (x == null) x = new Node();
+            if (d == key.length()) {
+                if (!x.isString) n++;
+                x.isString = true;
+            }
+            else {
+                char c = key.charAt(d);
+                x.next[c] = add(x.next[c], key, d+1);
+            }
+            return x;
+        }
+        
+        /**
+         * Returns the number of strings in the set.
+         * @return the number of strings in the set
+         */
+        public int size() {
+            return n;
+        }
+        
+        /**
+         * Is the set empty?
+         * @return {@code true} if the set is empty, and {@code false} otherwise
+         */
+        public boolean isEmpty() {
+            return size() == 0;
+        }
+        
+        /**
+         * Returns all of the keys in the set, as an iterator.
+         * To iterate over all of the keys in a set named {@code set}, use the
+         * foreach notation: {@code for (Key key : set)}.
+         * @return an iterator to all of the keys in the set
+         */
+        public Iterator<String> iterator() {
+            return keysWithPrefix("").iterator();
+        }
+        
+        /**
+         * Returns all of the keys in the set that start with {@code prefix}.
+         * @param prefix the prefix
+         * @return all of the keys in the set that start with {@code prefix},
+         *     as an iterable
+         */
+        public Iterable<String> keysWithPrefix(String prefix) {
+            Queue<String> results = new Queue<String>();
+            Node x = get(root, prefix, 0);
+            collect(x, new StringBuilder(prefix), results);
+            return results;
+        }
+        
+        private void collect(Node x, StringBuilder prefix, Queue<String> results) {
+            if (x == null) return;
+            if (x.isString) results.enqueue(prefix.toString());
+            for (char c = 0; c < R; c++) {
+                prefix.append(c);
+                collect(x.next[c], prefix, results);
+                prefix.deleteCharAt(prefix.length() - 1);
+            }
+        }
+    }
+    
+    // Initializes the data structure using the given array of strings as the dictionary.
+    // (You can assume each word in the dictionary contains only the uppercase letters A through Z.)
+    public BoggleSolver(String[] dictionary) {
+        for (int i = 0; i < dictionary.length; i++)
+            this.dict.add(dictionary[i]);      
+    }
+    
+    // Enumerate all strings that can be composed by following sequences of adjacent dice.
+    private Iterable<String> getAllWords(BoggleBoard board) {
+        SET<String> enumeration = new SET<String>();
+        r = board.rows();
+        c = board.columns();
+        Bag<Integer>[] adj = adjacentMatrix(r, c);
+        // 
+        for (int d = 0; d < r * c; d++) {
+            dfs(adj, d);
+            for (int x = v; x != s; x = edgeTo[x])
+                path.push(x);
+            path.push(s);
+        }
+    
+    // depth-first search method
+    private void dfs(Bag<Integer>[] adj, int d) {
+        boolean[] marked = new boolean[adj.length];
+        int[] charTo = new int[adj.length];
+        marked[d] = true;
+        for (int dice : adj[d]) {
+            if (!marked[dice]) {
+                charTo[dice] = d;
+                dfs(adj, dice);
+            }
+        }
+    }
+    
+    // helper method to get adjacent dice
+    private Bag<Integer>[] adjacentMatrix(int r, int c) {
+        int D = r * c;
+        adj = (Bag<Integer>[]) new Bag[D];
+        for (int d = 0; d < D; d++) {
+            // find the position of the dice
+            int row = d / r;
+            int col = d % r;
+            if (i != 0)                   adj[d].add(d - c);      // top dice
+            if (i != r - 1)               adj[d].add(d + c);      // bottom dice
+            if (j != 0)                   adj[d].add(d - 1);      // left dice
+            if (j != c - 1)               adj[d].add(d + 1);      // right dice            
+            if (i != 0 && j != 0)         adj[d].add(d - c - 1);  // top left dice
+            if (i != 0 && j != c - 1)     adj[d].add(d - c + 1);  // top right dice
+            if (i != r - 1 && j != 0)     adj[d].add(d + c - 1);  // bottom left dice
+            if (i != r - 1 && j != c - 1) adj[d].add(d + c + 1);  // top right dice
+        }
+        return adj;
+    }
+        
+    // Returns the set of all valid words in the given Boggle board, as an Iterable.
+    public Iterable<String> getAllValidWords(BoggleBoard board) {}
+
+    // Returns the score of the given word if it is in the dictionary, zero otherwise.
+    // (You can assume the word contains only the uppercase letters A through Z.)
+    public int scoreOf(String word) {}
+    
+    // Unit test of the data structure
+    public static void main(String[] args) {
+        In in = new In(args[0]);
+        String[] dictionary = in.readAllStrings();
+        BoggleSolver solver = new BoggleSolver(dictionary);
+        BoggleBoard board = new BoggleBoard(args[1]);
+        int score = 0;
+        for (String word : solver.getAllValidWords(board)) {
+            StdOut.println(word);
+            score += solver.scoreOf(word);
+        }
+        StdOut.println("Score = " + score);
+    }
+}

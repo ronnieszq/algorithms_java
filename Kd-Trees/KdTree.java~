@@ -1,0 +1,132 @@
+import edu.princeton.cs.algs4.Point2D;
+import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.Queue;
+import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.In;
+
+public class KdTree {
+    private Node root;             // root of KdTree
+    private int size;              // size of KdTree
+
+    private static class Node {
+        private Point2D p;         // the point
+        private RectHV rect;       // the axis-aligned rectangle corresponding to this node
+        private Node lb;           // the left/bottom subtree
+        private Node rt;           // the right/top subtree
+
+        public Node(Point2D p, RectHV rect) {
+            this.p = p;
+            this.rect = rect;
+        }
+    }
+    
+    /**
+     * Initializes an empty tree.
+     */
+    public KdTree() {
+    }    
+    
+    /**
+     * Returns true if this KdTree is empty.
+     * @return true if this KdTree is empty; false otherwise
+     */
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+
+    /**
+     * Returns the number of points in this KdTree.
+     * @return the number of points in this KdTree
+     */
+    public int size() {
+        return size;
+    }
+    
+    /**
+     * Inserts the specified point into the KdTree.
+     *
+     * @param  p the point
+     * @throws IllegalArgumentException if the point is null
+     */
+    public void insert(Point2D p){
+        if (p == null) throw new IllegalArgumentException("calls insert() with a null point");
+
+        put(root, p, true);              // start from the root node
+        assert check();
+    }
+
+    /**
+     * A helper function that recursively finds the node to insert a new point.
+     *
+     * @param  n the current node
+     * @param  p the point
+     * @param  ort the orientation of the current node (vertical or horizontal)
+     * @return the new node where the point is inserted
+     */
+    private Node put(Node n, Point2D p, boolean ort) {
+        if (n == null) {
+            
+            RectHV rect = new RectHV(xmin, ymin, xmax, ymax);
+            return new Node(p, rect);
+        }
+        
+        double xmin = 0.0;
+        double ymin = 0.0;
+        double xmax = 1.0;
+        double ymax = 1.0;
+        int cmp;
+        if (ort) cmp = p.x - n.p.x;      // if vertial, compare x-coordinates
+        else     cmp = p.y - n.p.y;      // if horizontal, compare y-coordinates
+        // flip the orientation everytime
+        if (cmp < 0) {
+            if (ort) {
+                xmax = p.x;
+                ymin = p.y;
+            }
+            else {
+                ymax = p.y;
+            put(n.lb, p, !ort);
+        }
+        else {
+            if (ort) n.lb.rect.xmin = p.x;
+            else     n.lb.rect.ymin = p.y;
+            put(n.rt, p, !ort);
+        }
+        size++;                          // increment the size of the KdTree by 1
+    }
+    
+    /**
+     * Does this KdTree contain the given point?
+     *
+     * @param  p the point
+     * @return true if this KdTree contains the point and
+     *         false otherwise
+     * @throws IllegalArgumentException if point is null
+     */
+    public boolean contains(Point2D p) {
+        if (p == null) throw new IllegalArgumentException("argument to contains() is null");
+        return get(root, p, true) != null;
+    }
+
+    /**
+     * A helper function that recursively checks if the point is in the KdTree
+     *
+     * @param  n the current node
+     * @param  p the point
+     * @param  ort the orientation of the current node (vertical or horizontal)
+     * @return the node where the point is found;
+     *         null if not found in the KdTree
+     */
+    private Node get(Node n, Point2D p, boolean ort) {
+        if (n == null) return null;
+        
+        int cmp;
+        if (ort) cmp = p.x - n.p.x;      // if vertial, compare x-coordinates
+        else     cmp = p.y - n.p.y;      // if horizontal, compare y-coordinates
+        // flip the orientation everytime
+        if (cmp < 0)                     return get(n.lb, p, !ort);
+        else if (!p.compareTo(n.p) == 0) return get(n.rt, p, !ort);
+        else                             return n;
+    }
+}
